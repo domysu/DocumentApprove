@@ -1,0 +1,17 @@
+﻿@page "/logout"
+@inject CustomAuthenticationStateProvider AuthenticationStateProvider
+@inject NavigationManager NavigationManager
+<div> You have logged out</div>
+
+
+@code {
+
+    protected override async Task OnInitializedAsync()
+    {
+
+        await base.OnInitializedAsync();
+        await AuthenticationStateProvider.MarkUserAsLoggedOut();
+        NavigationManager.NavigateTo("/", true);
+    }
+
+}

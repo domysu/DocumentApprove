@@ -1,0 +1,45 @@
+﻿@page "/document-data/{documentId:int}"
+@using DokumentuTvirtinimoSistema.Models
+@using Microsoft.EntityFrameworkCore
+@inject AppDbContext _context
+
+<h3>Document Data for Document @documentId</h3>
+
+@if (documentDataList == null)
+{
+    <p>Loading...</p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Field Name</th>
+                <th>Field Value</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var data in documentDataList)
+            {
+                <tr>
+                    <td>@data.FieldName</td>
+                    <td>@data.FieldValue</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    [Parameter]
+    public int documentId { get; set; }
+
+    private List<DocumentData> documentDataList;
+
+    protected override async Task OnInitializedAsync()
+    {
+        documentDataList = await _context.DocumentData
+            .Where(dd => dd.RequestId == documentId)
+            .ToListAsync();
+    }
+}

@@ -1,0 +1,69 @@
+﻿@page "/document-review/{documentId:int}"
+@using DokumentuTvirtinimoSistema.Models
+@using Microsoft.EntityFrameworkCore
+@inject AppDbContext _context
+@inject NavigationManager Navigation
+@using Microsoft.AspNetCore.Authorization
+@attribute [Authorize(Roles = "Admin")]
+
+<h3>Review Document @documentId</h3>
+
+@if (documentReview == null)
+{
+    <p>Loading...</p>
+}
+else
+{
+    <EditForm Model="documentReview" OnValidSubmit="HandleValidSubmit" FormName="DocumentReviewSubmit">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+
+        <div>
+            <label for="status">Status:</label>
+            <InputText id="status" @bind-Value="documentReview.Status" />
+        </div>
+        <div>
+            <label for="comments">Comments:</label>
+            <InputText id="comments" @bind-Value="documentReview.Comments" />
+        </div>
+        <div>
+            <label for="reviewedBy">Reviewed By:</label>
+            <InputText id="reviewedBy" @bind-Value="documentReview.ReviewedBy" />
+        </div>
+        <div>
+            <label for="reviewedDate">Reviewed Date:</label>
+            <InputDate id="reviewedDate" @bind-Value="documentReview.ReviewedDate" />
+        </div>
+
+        <button type="submit">Submit Review</button>
+    </EditForm>
+}
+
+@code {
+    [Parameter] public int documentId { get; set; }
+
+    private DocumentReview documentReview;
+
+    protected override async Task OnInitializedAsync()
+    {
+        documentReview = await _context.DocumentReviews
+            .FirstOrDefaultAsync(dr => dr.DocumentId == documentId);
+
+        if (documentReview == null)
+        {
+            documentReview = new DocumentReview
+                {
+                    DocumentId = documentId,
+                    SubmittedDate = DateTime.Now,
+                };
+            _context.DocumentReviews.Add(documentReview);
+            await _context.SaveChangesAsync();
+        }
+    }
+
+    private async Task HandleValidSubmit()
+    {
+        await _context.SaveChangesAsync();
+        Navigation.NavigateTo("/document-reviews");
+    }
+}

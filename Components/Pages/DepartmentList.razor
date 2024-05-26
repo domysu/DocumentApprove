@@ -1,0 +1,52 @@
+﻿@page "/department"
+@using DokumentuTvirtinimoSistema.Interfaces
+@using DokumentuTvirtinimoSistema.Models
+@inject IDepartment DepartmentService
+@inject NavigationManager NavigationManager
+@rendermode InteractiveServer
+
+<h3>Department</h3>
+
+@if (department == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+   
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Department ID</th>
+                <th>Department Name</th>
+                <th>Contact Details</th>
+            
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var department in department)
+            {
+                <tr>
+                    <td>@department.DepartmentId</td>
+                    <td>@department.DepartmentName</td>
+                    <td>@department.ContactDetails</td>
+                    <td>
+
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private List<Department>? department;
+
+    protected override async Task OnInitializedAsync()
+    {
+        department = await DepartmentService.GetItemsAsync();
+    }
+
+ 
+   
+}

@@ -1,0 +1,14 @@
+﻿@page "/auditlog"
+@using DokumentuTvirtinimoSistema.Models
+@using DokumentuTvirtinimoSistema.Services
+
+@inject AuditService AuditService
+
+@code {
+    private List<AuditLog> _auditLogs;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _auditLogs = await AuditService.GetAuditLogsAsync();
+    }
+}

@@ -1,0 +1,76 @@
+﻿@page "/document-reviews"
+@using DokumentuTvirtinimoSistema.Models
+@using Microsoft.EntityFrameworkCore
+@inject AppDbContext _context
+@inject NavigationManager Navigation
+@rendermode InteractiveServer
+@using Microsoft.AspNetCore.Authorization
+@attribute [Authorize(Roles = "Admin")]
+
+<h3>Document Review List</h3>
+
+@if (documentReviews == null)
+{
+    <p>Loading...</p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Document Id</th>
+                <th>Status</th>
+                <th>Submitted By</th>
+                <th>Submitted Date</th>
+                <th>Reviewed By</th>
+                <th>Reviewed Date</th>
+                <th>Comments</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var review in documentReviews)
+            {
+                <tr>
+                    <td>@review.Id</td>
+                    <td>@review.DocumentId</td>
+                    <td>@review.Status</td>
+                    <td>@review.SubmittedBy</td>
+                    <td>@review.SubmittedDate</td>
+                    <td>@review.ReviewedBy</td>
+                    <td>@review.ReviewedDate</td>
+                    <td>@review.Comments</td>
+                    <td>
+                        <button @onclick="() => ReviewDocument(review.DocumentId)">Review</button>
+                        <button @onclick="() => ViewDocumentData(review.DocumentId)">View Data</button>
+                        <button @onclick="() => ResubmitDocument(review.DocumentId)">Resubmit</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+@code {
+    private List<DocumentReview> documentReviews;
+
+    protected override async Task OnInitializedAsync()
+    {
+        documentReviews = await _context.DocumentReviews.ToListAsync();
+    }
+
+    private void ReviewDocument(int documentId)
+    {
+        Navigation.NavigateTo($"/document-review/{documentId}");
+    }
+
+    private void ViewDocumentData(int documentId)
+    {
+        Navigation.NavigateTo($"/document-data/{documentId}");
+    }
+
+    private void ResubmitDocument(int documentId)
+    {
+        Navigation.NavigateTo($"/resubmit-document/{documentId}");
+    }
+}

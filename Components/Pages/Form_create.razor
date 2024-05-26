@@ -1,0 +1,77 @@
+﻿@page "/create-form"
+@using DokumentuTvirtinimoSistema.Models
+@using DokumentuTvirtinimoSistema.Services
+@using Microsoft.AspNetCore.Components.Authorization;
+@using Microsoft.AspNetCore.Authentication;
+@using System.Security.Claims
+@inject AppDbContext _context
+@inject UserService UserControl
+@inject NavigationManager Navigation
+@rendermode InteractiveServer
+@inject CustomAuthenticationStateProvider CustomAuth
+<h3>Create Document Request</h3>
+
+<EditForm Model="documentRequest" OnValidSubmit="HandleValidSubmit">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div>
+        <label for="initiatingDepartment">Initiating Department:</label>
+        <InputText id="initiatingDepartment" @bind-Value="documentRequest.InitiatingDepartment" />
+    </div>
+    <div>
+        <label for="status">Status:</label>
+        <InputText id="status" @bind-Value="documentRequest.Status" />
+    </div>
+
+    <h4>Document Data Fields</h4>
+    @foreach (var data in documentDataList)
+    {
+        <div>
+            <label>Field Name:</label>
+            <InputText @bind-Value="data.FieldName" />
+            <label>Field Value:</label>
+            <InputText @bind-Value="data.FieldValue" />
+        </div>
+    }
+
+    <button type="button" @onclick="AddDataField">Add Field</button>
+    <button type="submit">Submit</button>
+</EditForm>
+@code {
+    private DocumentRequest documentRequest = new DocumentRequest { CreatedDate = DateTime.Now, DocumentData = new List<DocumentData>() };
+    private List<DocumentData> documentDataList = new List<DocumentData>();
+
+    private void AddDataField()
+    {
+        documentDataList.Add(new DocumentData());
+    }
+
+    private async Task HandleValidSubmit()
+    {
+        documentRequest.DocumentData = documentDataList;
+        _context.DocumentRequests.Add(documentRequest);
+        await _context.SaveChangesAsync();
+
+
+        var getUser = await CustomAuth.GetCurrentUser(); 
+        var currentUser = getUser.Identity.Name;
+       
+        var documentReview = new DocumentReview
+            {
+                DocumentId = documentRequest.RequestId,
+                Status = "Pending",
+                SubmittedBy = currentUser, 
+        SubmittedDate = DateTime.Now,
+                Comments = "Initial Submission",
+                ReviewedBy = null, 
+                ReviewedDate = null 
+            };
+
+        _context.DocumentReviews.Add(documentReview);
+        await _context.SaveChangesAsync();
+
+        // Redirect to the document review table
+        Navigation.NavigateTo("/document-reviews");
+    }
+}

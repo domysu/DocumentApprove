@@ -1,0 +1,15 @@
+﻿@page "/workflow"
+@inject WorkflowService WorkflowService
+@using DokumentuTvirtinimoSistema.Models
+@using DokumentuTvirtinimoSistema.Services
+@rendermode InteractiveServer
+
+
+@code {
+    private List<WorkflowStatus> _workflowStatuses;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _workflowStatuses = await WorkflowService.GetWorkflowStatusesAsync();
+    }
+}

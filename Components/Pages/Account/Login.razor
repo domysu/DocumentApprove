@@ -1,0 +1,91 @@
+﻿@page "/login"
+@using DokumentuTvirtinimoSistema.Models
+@using DokumentuTvirtinimoSistema.Models.ViewModels
+@using Microsoft.AspNetCore.Authentication
+@using Microsoft.AspNetCore.Authentication.Cookies
+@using Microsoft.AspNetCore.Identity
+@using System.Security.Claims
+@inject CustomAuthenticationStateProvider AuthenticationStateProvider
+@inject AppDbContext _context
+@inject IPasswordHasher<User> PasswordHasher
+@inject NavigationManager NavigationManager
+@inject IHttpContextAccessor HttpContextAccessor
+
+<div class="row">
+    <div class="col-lg-4 offset-lg-4 pb-4 border">
+        <EditForm Model="@Model" OnValidSubmit="Authenticate" FormName="LoginForm">
+            <DataAnnotationsValidator />
+
+            <div class="mb-3">
+                <label> Username:</label>
+                <InputText class="form-control" @bind-Value="Model.Username" placeholder="Enter username" />
+                <ValidationMessage For="() => Model.Username"></ValidationMessage>
+            </div>
+
+            <div class="mb-3">
+                <label>Password:</label>
+                <InputText type="password" class="form-control" @bind-Value="Model.Password" placeholder="Enter password" />
+                <ValidationMessage For="() => Model.Password"></ValidationMessage>
+            </div>
+            <div class="mb-3 text-center">
+                <span class="text-danger">@ErrorMessage</span>
+            </div>
+
+            <button type="submit" class="btn btn-primary mt-3">Login</button>
+        </EditForm>
+    </div>
+</div>
+
+@code {
+    
+    [SupplyParameterFromForm]
+    public LoginViewModel Model { get; set; } = new();
+    private string? ErrorMessage;
+
+    private async Task Authenticate()
+    {
+        var userAccount = _context.Users.FirstOrDefault(x => x.Username == Model.Username);
+        if (userAccount == null)
+        {
+            ErrorMessage = "Invalid User Name or password!";
+            return;
+        }
+
+        var result = PasswordHasher.VerifyHashedPassword(userAccount, userAccount.PasswordHash, Model.Password);
+        if (result == PasswordVerificationResult.Failed)
+        {
+            ErrorMessage = "Invalid User Name or Password";
+            return;
+        }
+
+        var role = _context.Roles.FirstOrDefault(r => r.Id == userAccount.RoleID);
+        if (role == null)
+        {
+            ErrorMessage = "User role not found!";
+            return;
+        }
+
+        var claims = new List<Claim>
+    {
+        new Claim(ClaimTypes.Name, Model.Username),
+        new Claim(ClaimTypes.Role, role.RoleName)
+    };
+
+        var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+        var principal = new ClaimsPrincipal(identity);
+
+        await HttpContextAccessor.HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal);
+
+        // Update the AuthenticationStateProvider with the new authentication state
+        await AuthenticationStateProvider.MarkUserAsAuthenticated(principal);
+
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        Console.WriteLine("UserName: " + userAccount.Username);
+        Console.WriteLine("Role Name: " + role.RoleName);
+        Console.WriteLine("Authentication State: " + authState.User.Identity.IsAuthenticated);
+
+        // Redirect to the home page after updating the authentication state
+        NavigationManager.NavigateTo("/");
+    }
+
+}

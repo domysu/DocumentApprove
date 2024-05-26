@@ -1,0 +1,26 @@
+﻿
+@page "/data-entry/{requestId:int}"
+@using Microsoft.AspNetCore
+@using DokumentuTvirtinimoSistema.Models
+@using Microsoft.EntityFrameworkCore
+@inject AppDbContext DbContext
+
+@code{
+[Parameter]
+public int RequestId { get; set; }
+
+private DocumentRequest request;
+private List<DocumentData> dataEntries = new List<DocumentData>();
+
+protected override async Task OnInitializedAsync()
+{
+    request = await DbContext.DocumentRequests.FindAsync(RequestId);
+    dataEntries = await DbContext.DocumentData.Where(d => d.RequestId == RequestId).ToListAsync();
+}
+
+private async Task SubmitDataAsync()
+{
+    DbContext.DocumentData.AddRange(dataEntries);
+    await DbContext.SaveChangesAsync();
+}
+}

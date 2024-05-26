@@ -1,0 +1,34 @@
+﻿@page "/edit-document/{documentId}"
+@using DokumentuTvirtinimoSistema.Models
+@using DokumentuTvirtinimoSistema.Services
+@inject DocumentCorrectionService DocumentCorrectionService
+@inject NavigationManager Navigation
+
+@code {
+    [Parameter]
+    public string DocumentId { get; set; }
+
+    private DocumentCorrection _correction = new DocumentCorrection();
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (!string.IsNullOrEmpty(DocumentId))
+        {
+            _correction = await DocumentCorrectionService.GetCorrectionByIdAsync(int.Parse(DocumentId));
+        }
+    }
+
+    private async Task SaveCorrection()
+    {
+        if (_correction.Id == 0)
+        {
+            await DocumentCorrectionService.AddCorrectionAsync(_correction);
+        }
+        else
+        {
+            await DocumentCorrectionService.UpdateCorrectionAsync(_correction);
+        }
+
+        Navigation.NavigateTo("/workflow-management");
+    }
+}
