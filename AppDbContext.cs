@@ -34,6 +34,7 @@ namespace DokumentuTvirtinimoSistema
         public DbSet<DocumentRequest> DocumentRequests { get; set; }
         public DbSet<DocumentData> DocumentData { get; set; }
         public DbSet<AuditLog> AuditLogs { get; set; }
+        public DbSet<DocumentTemplate> DocumentTemplates { get; set; }
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

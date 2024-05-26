@@ -4,42 +4,81 @@
 @using Microsoft.AspNetCore.Components.Authorization;
 @using Microsoft.AspNetCore.Authentication;
 @using System.Security.Claims
+@using System.Text.Json
 @inject AppDbContext _context
 @inject UserService UserControl
 @inject NavigationManager Navigation
-@rendermode InteractiveServer
 @inject CustomAuthenticationStateProvider CustomAuth
+@inject TemplateService TemplateService
+@rendermode InteractiveServer
 
-
+<h3>Create Document Request</h3>
 
 <EditForm Model="documentRequest" OnValidSubmit="HandleValidSubmit">
     <DataAnnotationsValidator />
     <ValidationSummary />
 
-   
+    <div class="form-group col-3">
+        <label for="templateId">Template</label>
+        <select id="templateId" class="form-control" @onchange="LoadTemplate" >
+            <option value="">Select a template</option>
+            @foreach (var template in templates)
+            {
+                <option value="@template.TemplateId">@template.TemplateName</option>
+            }
+        </select>
+    </div>
 
     <h4>Document Data Fields</h4>
     @foreach (var data in documentDataList)
     {
         <div class="mb-5">
-            <label class="">Field Name:</label>
-            <input class="form-control" @bind-value="data.FieldName" required/>
+            <label>Field Name:</label>
+            <input class="form-control" @bind-value="data.FieldName" required />
             <label>Field Value:</label>
-            <input class="form-control" @bind-value="data.FieldValue" required/>
+            <input class="form-control" @bind-value="data.FieldValue" required></input>
         </div>
     }
 
     <button class="btn btn-success mt-2" type="button" @onclick="AddDataField">Add Field</button>
     <button class="btn btn-success mt-2" type="submit">Submit</button>
 </EditForm>
+
 @code {
-   
-    private DocumentRequest documentRequest = new DocumentRequest { CreatedDate = DateTime.Now, DocumentData = new List<DocumentData>() };
+    private DocumentRequest documentRequest = new DocumentRequest
+    {
+        CreatedDate = DateTime.Now,
+        DocumentData = new List<DocumentData>()
+    };
+
     private List<DocumentData> documentDataList = new List<DocumentData>();
+    private List<DocumentTemplate> templates = new List<DocumentTemplate>();
+    private int? selectedTemplateId;
+
+    protected override async Task OnInitializedAsync()
+    {
+        templates = await TemplateService.GetAllTemplatesAsync();
+    }
 
     private void AddDataField()
     {
         documentDataList.Add(new DocumentData());
+    }
+
+    private async Task LoadTemplate(ChangeEventArgs e)
+    {
+        if (int.TryParse(e.Value.ToString(), out int templateId))
+        {
+            var selectedTemplate = templates.FirstOrDefault(t => t.TemplateId == templateId);
+            if (selectedTemplate != null)
+            {
+                var fields = JsonSerializer.Deserialize<List<DocumentData>>(selectedTemplate.FieldsStructure);
+                if (fields != null)
+                {
+                    documentDataList = fields;
+                }
+            }
+        }
     }
 
     private async Task HandleValidSubmit()
@@ -48,19 +87,19 @@
         _context.DocumentRequests.Add(documentRequest);
         await _context.SaveChangesAsync();
 
-        var getUser = await CustomAuth.GetCurrentUser(); 
+        var getUser = await CustomAuth.GetCurrentUser();
         var currentUser = getUser.Identity.Name;
-       
+
         var documentReview = new DocumentReview
-            {
-                DocumentId = documentRequest.RequestId,
-                Status = "Pending",
-                SubmittedBy = currentUser, 
-        SubmittedDate = DateTime.Now,
-                Comments = "Initial Submission",
-                ReviewedBy = null, 
-                ReviewedDate = null 
-            };
+        {
+            DocumentId = documentRequest.RequestId,
+            Status = "Pending",
+            SubmittedBy = currentUser,
+            SubmittedDate = DateTime.Now,
+            Comments = "Initial Submission",
+            ReviewedBy = null,
+            ReviewedDate = null
+        };
 
         _context.DocumentReviews.Add(documentReview);
         await _context.SaveChangesAsync();
