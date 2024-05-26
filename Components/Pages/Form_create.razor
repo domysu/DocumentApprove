@@ -21,16 +21,16 @@
     <h4>Document Data Fields</h4>
     @foreach (var data in documentDataList)
     {
-        <div>
-            <label>Field Name:</label>
-            <InputText @bind-Value="data.FieldName" />
+        <div class="mb-5">
+            <label class="">Field Name:</label>
+            <input class="form-control" @bind-value="data.FieldName" required/>
             <label>Field Value:</label>
-            <InputText @bind-Value="data.FieldValue" />
+            <input class="form-control" @bind-value="data.FieldValue" required/>
         </div>
     }
 
-    <button type="button" @onclick="AddDataField">Add Field</button>
-    <button type="submit">Submit</button>
+    <button class="btn btn-success mt-2" type="button" @onclick="AddDataField">Add Field</button>
+    <button class="btn btn-success mt-2" type="submit">Submit</button>
 </EditForm>
 @code {
    
