@@ -26,26 +26,7 @@ namespace DokumentuTvirtinimoSistema.Services
             return await _context.DocumentTemplates.FindAsync(templateId);
         }
 
-        public async Task AddTemplateAsync(DocumentTemplate template)
-        {
-            _context.DocumentTemplates.Add(template);
-            await _context.SaveChangesAsync();
-        }
-
-        public async Task UpdateTemplateAsync(DocumentTemplate template)
-        {
-            _context.Entry(template).State = EntityState.Modified;
-            await _context.SaveChangesAsync();
-        }
-
-        public async Task DeleteTemplateAsync(int templateId)
-        {
-            var template = await _context.DocumentTemplates.FindAsync(templateId);
-            if (template != null)
-            {
-                _context.DocumentTemplates.Remove(template);
-                await _context.SaveChangesAsync();
-            }
-        }
+      
+        
     }
 }
