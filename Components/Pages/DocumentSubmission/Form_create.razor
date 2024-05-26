@@ -19,7 +19,7 @@
     <ValidationSummary />
 
     <div class="form-group col-3">
-        <label for="templateId">Template</label>
+        
         <select id="templateId" class="form-control" @onchange="LoadTemplate" >
             <option value="">Select a template</option>
             @foreach (var template in templates)
@@ -29,10 +29,10 @@
         </select>
     </div>
 
-    <h4>Document Data Fields</h4>
+    <h4 class="mt-2">Document Data Fields</h4>
     @foreach (var data in documentDataList)
     {
-        <div class="mb-5">
+        <div class="mb-4">
             <label>Field Name:</label>
             <input class="form-control" @bind-value="data.FieldName" required />
             <label>Field Value:</label>
