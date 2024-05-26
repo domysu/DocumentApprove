@@ -12,7 +12,7 @@
             <div class="card-body">
                 <AuthorizeView>
                     <NotAuthorized>
-                        <span>You are logged out, please press <a href="/login">HERE</a> To log in.</span>
+                        <span>You are logged out, please log in or register to continue</span>
                     </NotAuthorized>
                     <Authorized>
                         <span>Hello, <b>@context.User.Identity.Name</b>. Your role is: <b>@GetUserRole(context.User)</b>.</span>
