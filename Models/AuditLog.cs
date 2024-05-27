@@ -1,11 +1,14 @@
-﻿namespace DokumentuTvirtinimoSistema.Models
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace DokumentuTvirtinimoSistema.Models
 {
     public class AuditLog
     {
-        public int Id { get; set; }
-        public string DocumentId { get; set; }
-        public string Action { get; set; }
-        public DateTime ActionDate { get; set; }
+            [Key] public int AuditId { get; set; }
+            public int AuditDocumentId { get; set; }
+            public string AuditStatus { get; set; }
+            public DateTime AuditTimestamp { get; set; }
     }
 }
+
     

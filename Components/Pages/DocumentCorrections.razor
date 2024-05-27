@@ -1,34 +1,85 @@
-﻿@page "/edit-document/{documentId}"
+﻿@page "/correction/{documentId:int}"
 @using DokumentuTvirtinimoSistema.Models
 @using DokumentuTvirtinimoSistema.Services
-@inject DocumentCorrectionService DocumentCorrectionService
+@using Microsoft.EntityFrameworkCore
+@inject AppDbContext _context
 @inject NavigationManager Navigation
+@inject CustomAuthenticationStateProvider CustomAuth
+@using Microsoft.AspNetCore.Authorization
+@attribute [Authorize(Roles = "Admin")]
+@rendermode InteractiveServer
+
+<h3>Correct Document @documentId</h3>
+
+@if (documentRequest == null)
+{
+    <p>Loading...</p>
+}
+else
+{
+    <EditForm Model="documentRequest" OnValidSubmit="HandleValidSubmit" FormName="DocumentCorrectionForm">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+
+        <h4 class="mt-2">Document Data Fields</h4>
+        @foreach (var data in documentRequest.DocumentData)
+        {
+            <div class="mb-4">
+                <label>Field Name:</label>
+                <input class="form-control" @bind-value="data.FieldName" required />
+                <label>Field Value:</label>
+                <input class="form-control" @bind-value="data.FieldValue" required></input>
+            </div>
+        }
+
+        <button class="btn btn-success mt-2" type="submit">Submit Corrections</button>
+    </EditForm>
+}
 
 @code {
-    [Parameter]
-    public string DocumentId { get; set; }
+    [Parameter] public int documentId { get; set; }
 
-    private DocumentCorrection _correction = new DocumentCorrection();
+    private DocumentRequest documentRequest;
 
     protected override async Task OnInitializedAsync()
     {
-        if (!string.IsNullOrEmpty(DocumentId))
+        documentRequest = await _context.DocumentRequests
+            .Include(dr => dr.DocumentData)
+            .FirstOrDefaultAsync(dr => dr.RequestId == documentId);
+
+        if (documentRequest == null)
         {
-            _correction = await DocumentCorrectionService.GetCorrectionByIdAsync(int.Parse(DocumentId));
+            Navigation.NavigateTo("/not-found");
         }
     }
-
-    private async Task SaveCorrection()
+    private async Task HandleValidSubmit()
     {
-        if (_correction.Id == 0)
+        try
         {
-            await DocumentCorrectionService.AddCorrectionAsync(_correction);
-        }
-        else
-        {
-            await DocumentCorrectionService.UpdateCorrectionAsync(_correction);
-        }
+            await _context.SaveChangesAsync();
 
-        Navigation.NavigateTo("/workflow-management");
+            var getUser = await CustomAuth.GetCurrentUser();
+            var currentUser = getUser.Identity.Name;
+
+            var documentReview = new DocumentReview
+                {
+                    DocumentId = documentRequest.RequestId,
+                    Status = "Corrected",
+                    SubmittedBy = currentUser,
+                    SubmittedDate = DateTime.Now,
+                    Comments = "Corrections Made",
+                    ReviewedBy = null,
+                    ReviewedDate = null
+                };
+            await _context.SaveChangesAsync();
+
+            Navigation.NavigateTo("/document-reviews");
+        }
+        catch (Exception ex)
+        {
+            // Log the exception and/or show a friendly error message
+            Console.WriteLine(ex.Message);
+            Navigation.NavigateTo("/error");
+        }
     }
 }

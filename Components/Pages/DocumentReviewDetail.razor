@@ -5,7 +5,7 @@
 @inject NavigationManager Navigation
 @using Microsoft.AspNetCore.Authorization
 @attribute [Authorize(Roles = "Admin")]
-
+@rendermode InteractiveServer
 <h3>Review Document @documentId</h3>
 
 @if (documentReview == null)
@@ -17,7 +17,6 @@ else
     <EditForm Model="documentReview" OnValidSubmit="HandleValidSubmit" FormName="DocumentReviewSubmit">
         <DataAnnotationsValidator />
         <ValidationSummary />
-
         <div>
             <label for="status">Status:</label>
             <InputText id="status" @bind-Value="documentReview.Status" />

@@ -20,7 +20,6 @@ else
             <tr>
                 <th>Id</th>
                 <th>Document Id</th>
-                <th>Status</th>
                 <th>Submitted By</th>
                 <th>Submitted Date</th>
                 <th>Reviewed By</th>
@@ -35,7 +34,6 @@ else
                 <tr>
                     <td>@review.Id</td>
                     <td>@review.DocumentId</td>
-                    <td>@review.Status</td>
                     <td>@review.SubmittedBy</td>
                     <td>@review.SubmittedDate</td>
                     <td>@review.ReviewedBy</td>
@@ -44,7 +42,7 @@ else
                     <td>
                         <button @onclick="() => ReviewDocument(review.DocumentId)">Review</button>
                         <button @onclick="() => ViewDocumentData(review.DocumentId)">View Data</button>
-                        <button @onclick="() => ResubmitDocument(review.DocumentId)">Resubmit</button>
+                        <button @onclick="() => DocumentCorrection(review.DocumentId)">Correction</button>
                     </td>
                 </tr>
             }
@@ -69,8 +67,8 @@ else
         Navigation.NavigateTo($"/document-data/{documentId}");
     }
 
-    private void ResubmitDocument(int documentId)
+    private void DocumentCorrection(int documentId)
     {
-        Navigation.NavigateTo($"/resubmit-document/{documentId}");
+        Navigation.NavigateTo($"/correction/{documentId}");
     }
 }

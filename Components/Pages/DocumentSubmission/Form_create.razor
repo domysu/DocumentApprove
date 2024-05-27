@@ -47,8 +47,11 @@
 @code {
     private DocumentRequest documentRequest = new DocumentRequest
     {
-        CreatedDate = DateTime.Now,
+            InitiatingDepartment = "Test",
+            Status = "Test",
+            CreatedDate = DateTime.Now,
         DocumentData = new List<DocumentData>()
+
     };
 
     private List<DocumentData> documentDataList = new List<DocumentData>();

@@ -10,7 +10,6 @@
         public string? ReviewedBy { get; set; } // Nullable string
         public DateTime? ReviewedDate { get; set; } // Nullable DateTime
         public string Comments { get; set; }
-
         public ICollection<ValidationLog> ValidationLogs { get; set; } = new List<ValidationLog>();
     }
 }

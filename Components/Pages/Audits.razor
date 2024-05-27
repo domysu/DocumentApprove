@@ -5,10 +5,35 @@
 @inject AuditService AuditService
 
 @code {
-    private List<AuditLog> _auditLogs;
+    [Parameter]
+    public int AuditDocumentId { get; set; }
+
+    private AuditLog auditlog;
 
     protected override async Task OnInitializedAsync()
     {
-        _auditLogs = await AuditService.GetAuditLogsAsync();
+        auditlog = await AuditService.GetAuditLogsAsync(AuditDocumentId);
+
+        if (auditlog == null)
+        {
+            Console.WriteLine($"No audits found: {AuditDocumentId}");
+        }
+        else
+        {
+            Console.WriteLine($"Audits found: DocumentId = {auditlog.AuditDocumentId}, Status = {auditlog.AuditStatus}, StatusEditTime = {auditlog.AuditTimestamp}");
+        }
     }
 }
+
+<div>
+    @if (auditlog != null)
+    {
+        <p><strong>Document ID:</strong> @auditlog.AuditDocumentId</p>
+        <p><strong>Status:</strong> @auditlog.AuditStatus</p>
+        <p><strong>Status Edit Time:</strong> @auditlog.AuditTimestamp</p>
+    }
+    else
+    {
+        <p>Loading...</p>
+    }
+</div>

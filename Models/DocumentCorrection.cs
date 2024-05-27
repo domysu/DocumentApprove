@@ -1,11 +1,13 @@
-﻿namespace DokumentuTvirtinimoSistema.Models
+﻿using Microsoft.AspNetCore.Components;
+
+namespace DokumentuTvirtinimoSistema.Models
 {
     public class DocumentCorrection
     {
-        public int Id { get; set; }
-        public string DocumentId { get; set; }
-        public string CorrectedData { get; set; }
-        public DateTime CorrectionDate { get; set; }
+        public int DataId { get; set; }
+        public int RequestId { get; set; }
+        public string FieldName { get; set; }
+        public string FieldValue { get; set; }
+        public DocumentRequest DocumentRequest { get; set; }
     }
 }
-    

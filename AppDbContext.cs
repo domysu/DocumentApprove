@@ -1,4 +1,5 @@
-﻿using DokumentuTvirtinimoSistema.Models;
+﻿using DokumentuTvirtinimoSistema.Components.Pages;
+using DokumentuTvirtinimoSistema.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 
@@ -74,6 +75,23 @@ namespace DokumentuTvirtinimoSistema
 
             modelBuilder.Entity<DocumentReview>()
           .HasKey(dr => dr.Id);  // Define the primary key
+            modelBuilder.Entity<DocumentCorrection>()
+            .HasKey(dc => dc.DataId);  // Define the primary key
+
+            modelBuilder.Entity<DocumentRequest>()
+            .HasMany(dr => dr.DocumentData)
+            .WithOne()
+            .HasForeignKey(dd => dd.RequestId);
+
+            modelBuilder.Entity<DocumentRequest>()
+            .HasMany(d => d.DocumentData)
+            .WithOne(d => d.DocumentRequest)
+            .HasForeignKey(d => d.RequestId);
+
+            modelBuilder.Entity<DocumentReview>()
+                .HasOne<DocumentRequest>()
+                .WithMany()
+                .HasForeignKey(d => d.DocumentId);
         }
     }
 }
