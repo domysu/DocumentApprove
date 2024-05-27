@@ -20,5 +20,6 @@ namespace DokumentuTvirtinimoSistema.Models
         public DateTime LastLogin { get; set; }
         [NotMapped]
         public List<UserRoles> Roles { get; set; } = new List<UserRoles>();
+        public Department Department { get; set; }  
     }
 }

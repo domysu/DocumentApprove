@@ -7,5 +7,6 @@ public class DocumentRequest
     public string Status { get; set; }
     public DateTime CreatedDate { get; set; }
     public ICollection<DocumentData> DocumentData { get; set; }
+    public Department department { get; set; }
 
 }

@@ -2,9 +2,10 @@
 @using DokumentuTvirtinimoSistema.Models
 @using DokumentuTvirtinimoSistema.Services
 @using Microsoft.AspNetCore.Components.Authorization;
-@using Microsoft.AspNetCore.Authentication;
+@using Microsoft.AspNetCore.Authentication
 @using System.Security.Claims
 @using System.Text.Json
+@using Microsoft.EntityFrameworkCore
 @inject AppDbContext _context
 @inject UserService UserControl
 @inject NavigationManager Navigation
@@ -14,13 +15,12 @@
 
 <h3>Create Document Request</h3>
 
-<EditForm Model="documentRequest" OnValidSubmit="HandleValidSubmit">
+<EditForm Model="@documentRequest" OnValidSubmit="HandleValidSubmit">
     <DataAnnotationsValidator />
     <ValidationSummary />
 
     <div class="form-group col-3">
-        
-        <select id="templateId" class="form-control" @onchange="LoadTemplate" >
+        <select id="templateId" class="form-control" @onchange="LoadTemplate">
             <option value="">Select a template</option>
             @foreach (var template in templates)
             {
@@ -36,7 +36,7 @@
             <label>Field Name:</label>
             <input class="form-control" @bind-value="data.FieldName" required />
             <label>Field Value:</label>
-            <input class="form-control" @bind-value="data.FieldValue" required></input>
+            <input class="form-control" @bind-value="data.FieldValue" required />
         </div>
     }
 
@@ -45,22 +45,31 @@
 </EditForm>
 
 @code {
-    private DocumentRequest documentRequest = new DocumentRequest
-    {
-            InitiatingDepartment = "Test",
-            Status = "Test",
-            CreatedDate = DateTime.Now,
-        DocumentData = new List<DocumentData>()
-
-    };
-
+    private DocumentRequest documentRequest = new DocumentRequest();
     private List<DocumentData> documentDataList = new List<DocumentData>();
     private List<DocumentTemplate> templates = new List<DocumentTemplate>();
     private int? selectedTemplateId;
 
     protected override async Task OnInitializedAsync()
     {
+        await InitializeDocumentRequestAsync();
         templates = await TemplateService.GetAllTemplatesAsync();
+    }
+
+    private async Task InitializeDocumentRequestAsync()
+    {
+        // You can perform asynchronous operations here
+        documentRequest.InitiatingDepartment = await GetUserDepartmentAsync();
+        documentRequest.Status = "Submitted for review";
+        documentRequest.CreatedDate = DateTime.Now;
+    }
+
+    private async Task<string> GetUserDepartmentAsync()
+    {
+        var getUser = await CustomAuth.GetCurrentUser();
+        var currentUser = getUser.Identity.Name;
+        var user = await _context.Users.Include(u => u.Department).FirstOrDefaultAsync(u => u.Username == currentUser);
+        return user?.Department?.DepartmentName;
     }
 
     private void AddDataField()
@@ -94,15 +103,15 @@
         var currentUser = getUser.Identity.Name;
 
         var documentReview = new DocumentReview
-        {
-            DocumentId = documentRequest.RequestId,
-            Status = "Pending",
-            SubmittedBy = currentUser,
-            SubmittedDate = DateTime.Now,
-            Comments = "Initial Submission",
-            ReviewedBy = null,
-            ReviewedDate = null
-        };
+            {
+                DocumentId = documentRequest.RequestId,
+                Status = "Pending",
+                SubmittedBy = currentUser,
+                SubmittedDate = DateTime.Now,
+                Comments = "Initial Submission",
+                ReviewedBy = null,
+                ReviewedDate = null
+            };
 
         _context.DocumentReviews.Add(documentReview);
         await _context.SaveChangesAsync();
