@@ -58,7 +58,7 @@
 
     private async Task InitializeDocumentRequestAsync()
     {
-        // You can perform asynchronous operations here
+       
         documentRequest.InitiatingDepartment = await GetUserDepartmentAsync();
         documentRequest.Status = "Submitted for review";
         documentRequest.CreatedDate = DateTime.Now;
