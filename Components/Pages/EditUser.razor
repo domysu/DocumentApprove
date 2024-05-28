@@ -2,10 +2,12 @@
 @using DokumentuTvirtinimoSistema.Interfaces
 @using DokumentuTvirtinimoSistema.Services
 @using DokumentuTvirtinimoSistema.Models
+@using Microsoft.AspNetCore.Authorization
 @inject RolesService RolesService
 @inject UserService UserService
 @inject NavigationManager NavigationManager
 @rendermode InteractiveServer
+@attribute [Authorize(Roles = "Admin")]
 
 
 
