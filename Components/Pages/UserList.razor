@@ -1,0 +1,79 @@
+﻿@using DokumentuTvirtinimoSistema.Interfaces
+@using DokumentuTvirtinimoSistema.Services
+@using DokumentuTvirtinimoSistema.Models
+@inject IUser UserService
+@inject NavigationManager NavigationManager
+@rendermode InteractiveServer
+
+@page "/user-list"
+
+<h3>Users</h3>
+
+@if (Users == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>User ID</th>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Actions</th>
+
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var user in Users)
+            {
+                <tr>
+                    <td>@user.UserId</td>
+                    <td>@user.Username</td>
+                    <td>@user.Email</td>
+                    <td>
+                        <button class="btn btn-primary" @onclick="() => EditUser(user.UserId)">Edit</button>
+                        <button class="btn btn-danger" @onclick="() => DeleteUser(user.UserId)">Delete</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private List<User> Users = new List<User>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            Users = await UserService.GetUsersAsync();
+        }
+        catch (Exception ex)
+        {
+            // Handle exceptions (e.g., log them, show an error message)
+        }
+    }
+
+    private void EditUser(int userId)
+    {
+        NavigationManager.NavigateTo($"/edit-user/{userId}");
+    }
+
+    private async Task DeleteUser(int userId)
+    {
+        try
+        {
+            UserService.deleteUser(userId);
+            
+            NavigationManager.NavigateTo("/user-list");
+            StateHasChanged();
+        }
+        catch
+        {
+            Console.WriteLine($"Error deleting category: {userId}");
+        }
+    }
+}

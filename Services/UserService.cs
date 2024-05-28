@@ -30,6 +30,37 @@ namespace DokumentuTvirtinimoSistema.Services
                 throw;
             }
         }
+        public async Task<User> GetUserByIdAsync(int id)
+        {
+            try
+            {
+                var category = await _dbContext.Users.FindAsync(id);
+                if (category != null)
+                {
+                    return category;
+                }
+                else
+                {
+                    throw new KeyNotFoundException("No category found with this ID.");
+                }
+            }
+            catch
+            {
+                throw;
+            }
+        }
+        public async Task updateUser(User users)
+        {
+            try
+            {
+                _dbContext.Entry(users).State = EntityState.Modified;
+                await _dbContext.SaveChangesAsync();
+            }
+            catch
+            {
+                throw new KeyNotFoundException("Key not found when updating");
+            }
+        }
 
         public async Task<User> AddUserAsync(User user, string password)
         {
@@ -47,6 +78,26 @@ namespace DokumentuTvirtinimoSistema.Services
                 _dbContext.Users.Add(user);
                 await _dbContext.SaveChangesAsync();
                return user;
+            }
+            catch
+            {
+                throw;
+            }
+        }
+        public async Task deleteUser(int id)
+        {
+            try
+            {
+                var user = await _dbContext.Users.FindAsync(id);
+                if (user != null)
+                {
+                    _dbContext.Users.Remove(user);
+                    await _dbContext.SaveChangesAsync();
+                }
+                else
+                {
+                    throw new ArgumentNullException("No user found with this ID.");
+                }
             }
             catch
             {
