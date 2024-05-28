@@ -15,6 +15,10 @@
 }
 else
 {
+
+    <div>
+        <span> Current Document Count: <b class="text-success"> @DocumentCount </b> </span>
+    </div>
     <table class="table">
         <thead>
             <tr>
@@ -51,10 +55,18 @@ else
 }
 @code {
     private List<DocumentReview> documentReviews;
+    private List<DocumentData> documentData;
+    private int DocumentCount;
+
+    public int getFields()
+    {
+        return documentReviews.Count;
+    }
 
     protected override async Task OnInitializedAsync()
     {
         documentReviews = await _context.DocumentReviews.ToListAsync();
+        DocumentCount = getFields();
     }
 
     private void ReviewDocument(int documentId)

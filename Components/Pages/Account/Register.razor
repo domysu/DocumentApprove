@@ -19,43 +19,63 @@
 <EditForm Model="@newUser" OnValidSubmit="HandleValidSubmit" FormName="Register">
     <DataAnnotationsValidator />
     <ValidationSummary />
-  
-
 
     <div class="form-group">
         <label for="username">Username:</label>
-        <InputText id="username" class="form-control" @bind-Value="newUser.Username" placeholder="Enter username" required/>
+        <InputText id="username" class="form-control" @bind-Value="newUser.Username" placeholder="Enter username" required />
     </div>
 
     <div class="form-group">
         <label for="email">Email:</label>
-        <InputText id="email" class="form-control" @bind-Value="newUser.Email" placeholder="Enter email" required/>
+        <InputText id="email" class="form-control" @bind-Value="newUser.Email" placeholder="Enter email" required />
     </div>
 
     <div class="form-group">
         <label for="password">Password:</label>
-        <InputText id="password" type="password" class="form-control" @bind-Value="password" placeholder="Enter password" required/>
+        <InputText id="password" type="password" class="form-control" @bind-Value="password" placeholder="Enter password" required />
     </div>
+    @if (!string.IsNullOrEmpty(passwordErrorMessage))
+    {
+        <div class="alert alert-danger mt-3" role="alert">
+            @passwordErrorMessage
+        </div>
+    }
 
     <button type="submit" class="btn btn-primary mt-3">Register</button>
 </EditForm>
-
-
-
 
 @code {
     private string password = "";
     private User newUser;
     private string errorMessage = "";
+    private string passwordErrorMessage = "";
 
     protected override void OnInitialized()
     {
-
         newUser = new User { DepartmentId = 1, RoleID = 2 }; // Assigning user to default department
+    }
+
+    private bool CheckPasswordLength()
+    {
+        if (password.Length < 3 || password.Length > 18)
+        {
+            passwordErrorMessage = "Password must be between 3 and 18 characters long.";
+            return false;
+        }
+        else
+        {
+            passwordErrorMessage = "";
+            return true;
+        }
     }
 
     public async Task HandleValidSubmit()
     {
+        if (!CheckPasswordLength())
+        {
+            return;
+        }
+
         try
         {
             var existingUser = await UserService.GetUserByUsernameAsync(newUser.Username);
@@ -64,7 +84,6 @@
                 errorMessage = "This username is already registered.";
                 return; // cancel register
             }
-
 
             var userCreated = await UserService.AddUserAsync(newUser, password);
             if (userCreated != null)
@@ -76,11 +95,9 @@
                 NavigationManager.NavigateTo("/");
             }
         }
-        catch(DbUpdateException a)
+        catch (DbUpdateException a)
         {
             errorMessage = "Error has occured";
         }
-
     }
-
 }

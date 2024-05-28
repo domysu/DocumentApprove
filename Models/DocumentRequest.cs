@@ -9,4 +9,14 @@ public class DocumentRequest
     public ICollection<DocumentData> DocumentData { get; set; }
     public Department department { get; set; }
 
+
+    public DocumentRequest() { }
+    public DocumentRequest(string initiatingDepartment,string status, DateTime createdDate) {
+      
+        InitiatingDepartment = initiatingDepartment;
+        Status = status;
+        CreatedDate = createdDate;
+
+
+    } 
 }

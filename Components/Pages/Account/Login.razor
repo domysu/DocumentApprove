@@ -81,9 +81,7 @@
         await AuthenticationStateProvider.MarkUserAsAuthenticated(principal);
 
         var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
-        Console.WriteLine("UserName: " + userAccount.Username);
-        Console.WriteLine("Role Name: " + role.RoleName);
-        Console.WriteLine("Authentication State: " + authState.User.Identity.IsAuthenticated);
+    
 
         // Redirect to the home page after updating the authentication state
         NavigationManager.NavigateTo("/");

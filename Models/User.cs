@@ -18,8 +18,9 @@ namespace DokumentuTvirtinimoSistema.Models
         public bool isActive { get; set; }
 
         public DateTime LastLogin { get; set; }
-        [NotMapped]
+     
       
         public Department Department { get; set; }  
+       
     }
 }

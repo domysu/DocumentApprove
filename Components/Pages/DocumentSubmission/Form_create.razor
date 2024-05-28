@@ -15,53 +15,56 @@
 
 <h3>Create Document Request</h3>
 
-<EditForm Model="@documentRequest" OnValidSubmit="HandleValidSubmit">
-    <DataAnnotationsValidator />
-    <ValidationSummary />
+@if (documentRequest != null)
+{
+    <EditForm Model="@documentRequest" OnValidSubmit="HandleValidSubmit">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
 
-    <div class="form-group col-3">
-        <select id="templateId" class="form-control" @onchange="LoadTemplate">
-            <option value="">Select a template</option>
-            @foreach (var template in templates)
-            {
-                <option value="@template.TemplateId">@template.TemplateName</option>
-            }
-        </select>
-    </div>
-
-    <h4 class="mt-2">Document Data Fields</h4>
-    @foreach (var data in documentDataList)
-    {
-        <div class="mb-4">
-            <label>Field Name:</label>
-            <input class="form-control" @bind-value="data.FieldName" required />
-            <label>Field Value:</label>
-            <input class="form-control" @bind-value="data.FieldValue" required />
+        <div class="form-group col-3">
+            <select id="templateId" class="form-control" @onchange="LoadTemplate">
+                <option value="">Select a template</option>
+                @foreach (var template in templates)
+                {
+                    <option value="@template.TemplateId">@template.TemplateName</option>
+                }
+            </select>
         </div>
-    }
 
-    <button class="btn btn-success mt-2" type="button" @onclick="AddDataField">Add Field</button>
-    <button class="btn btn-success mt-2" type="submit">Submit</button>
-</EditForm>
+        <h4 class="mt-2">Document Data Fields</h4>
+        @foreach (var data in documentDataList)
+        {
+            <div class="mb-4">
+                <label>Field Name:</label>
+                <input class="form-control" @bind-value="data.FieldName" required />
+                <label>Field Value:</label>
+                <input class="form-control" @bind-value="data.FieldValue" required />
+            </div>
+        }
+
+        <button class="btn btn-success mt-2" type="button" @onclick="AddDataField">Add Field</button>
+        <button class="btn btn-success mt-2" type="submit">Submit</button>
+    </EditForm>
+}
+else
+{
+    <p>Loading...</p>
+}
 
 @code {
-    private DocumentRequest documentRequest = new DocumentRequest();
+    private DocumentRequest documentRequest;
     private List<DocumentData> documentDataList = new List<DocumentData>();
     private List<DocumentTemplate> templates = new List<DocumentTemplate>();
     private int? selectedTemplateId;
 
     protected override async Task OnInitializedAsync()
     {
-        await InitializeDocumentRequestAsync();
         templates = await TemplateService.GetAllTemplatesAsync();
-    }
+        string initiatingDepartment = await GetUserDepartmentAsync();
+        string status = "Submitted for review";
+        DateTime createdDate = DateTime.Now;
 
-    private async Task InitializeDocumentRequestAsync()
-    {
-       
-        documentRequest.InitiatingDepartment = await GetUserDepartmentAsync();
-        documentRequest.Status = "Submitted for review";
-        documentRequest.CreatedDate = DateTime.Now;
+        documentRequest = new DocumentRequest(initiatingDepartment, status, createdDate);
     }
 
     private async Task<string> GetUserDepartmentAsync()
@@ -102,21 +105,19 @@
         var getUser = await CustomAuth.GetCurrentUser();
         var currentUser = getUser.Identity.Name;
 
-        var documentReview = new DocumentReview
-            {
-                DocumentId = documentRequest.RequestId,
-                Status = "Pending",
-                SubmittedBy = currentUser,
-                SubmittedDate = DateTime.Now,
-                Comments = "Initial Submission",
-                ReviewedBy = null,
-                ReviewedDate = null
-            };
+        var documentReview = new DocumentReview(
+            documentRequest.RequestId,
+            "Pending",
+            currentUser,
+            DateTime.Now,
+            "Initial Submission",
+            null,
+            DateTime.Now
+        );
 
         _context.DocumentReviews.Add(documentReview);
         await _context.SaveChangesAsync();
 
-        // Redirect to the document review table
         Navigation.NavigateTo("/success");
     }
 }

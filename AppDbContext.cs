@@ -25,7 +25,7 @@ namespace DokumentuTvirtinimoSistema
         }
 
         public DbSet<Department> Departments { get; set; }
-        public DbSet<UserRoles> Roles { get; set; } 
+        public DbSet<Roles> Roles { get; set; } 
         public DbSet<User> Users { get; set; }
         public DbSet<DocumentReview> DocumentReviews { get; set; }
         public DbSet<ValidationLog> ValidationLogs { get; set; }
@@ -59,10 +59,6 @@ namespace DokumentuTvirtinimoSistema
             .HasKey(dd => dd.RequestId);
 
 
-            modelBuilder.Entity<User>()
-               .HasMany(u => u.Roles)
-               .WithOne()
-               .HasForeignKey(u => u.Id);
 
 
             modelBuilder.Entity<DocumentData>()

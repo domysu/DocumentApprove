@@ -11,5 +11,22 @@
         public DateTime? ReviewedDate { get; set; } // Nullable DateTime
         public string Comments { get; set; }
         public ICollection<ValidationLog> ValidationLogs { get; set; } = new List<ValidationLog>();
+        
+        public DocumentReview() { } // konstruktorius
+
+        public DocumentReview(int documentid, string status, string submittedby, DateTime submittedDate, string comments, string reviewedby, DateTime revieweddate)
+        {
+            DocumentId = documentid;
+            Status = status;
+            SubmittedBy = submittedby;
+            SubmittedDate = submittedDate;
+            Comments = comments;
+            ReviewedBy = reviewedby;
+            ReviewedDate = revieweddate;
+            
+
+        }
+
+        
     }
 }

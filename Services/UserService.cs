@@ -55,7 +55,7 @@ namespace DokumentuTvirtinimoSistema.Services
         }
         public async Task<User> GetUserByUsernameAsync(string username)
         {
-            return await _dbContext.Users.Include(u => u.Roles)
+            return await _dbContext.Users
                                          .FirstOrDefaultAsync(u => u.Username == username);
         }
     

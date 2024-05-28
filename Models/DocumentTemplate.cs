@@ -9,5 +9,17 @@ namespace DokumentuTvirtinimoSistema.Models
         public string TemplateName { get; set; }
         public string Description { get; set; }
         public string FieldsStructure { get; set; } // JSON structure representing the fields
+
+        // Numatytasis konstruktorius
+        public DocumentTemplate()
+        {
+        }
+
+        // Konstruktorius su parametrais
+        public DocumentTemplate(string templateName, string description)
+        {
+            TemplateName = templateName;
+            Description = description;
+        }
     }
 }

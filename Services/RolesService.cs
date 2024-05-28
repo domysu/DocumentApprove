@@ -14,16 +14,12 @@ namespace DokumentuTvirtinimoSistema.Services
             _IUser = IUser; 
             _context = context;
         }
-        public async Task<List<UserRoles>> GetRolesAsync()
+        public async Task<List<Roles>> GetRolesAsync()
         {
             return await _context.Roles.ToListAsync();
 
         }
 
-        public async Task<bool> IsUserInRoleAsync(string username, string role)
-        {
-            var user = await _IUser.GetUserByUsernameAsync(username);
-            return user?.Roles.Any(r => r.RoleName == role) ?? false;
-        }
+      
     }
 }
