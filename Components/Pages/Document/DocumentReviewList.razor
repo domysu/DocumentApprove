@@ -46,6 +46,10 @@ else
                         {
                             <span class="text-success">@review.Status</span>
                         }
+                        else if(review.Status == "Pending") 
+                        {
+                            <span class="text-warning">@review.Status</span>
+                        }
                         else
                         {
                             <span class="text-danger">@review.Status</span>
