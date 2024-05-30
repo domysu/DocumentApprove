@@ -6,12 +6,13 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using DokumentuTvirtinimoSistema.Models;
+using DokumentuTvirtinimoSistema.Interfaces;
 using DokumentuTvirtinimoSistema;
 using Microsoft.EntityFrameworkCore;
 using DokumentuTvirtinimoSistema.Components.Pages;
 
 
-public class AuditService
+public class AuditService : IAudit
 {
     private readonly AppDbContext _context;
     private readonly ILogger<AuditService> _logger;
@@ -22,24 +23,23 @@ public class AuditService
         _logger = logger;
     }
 
-    public async Task<AuditLog> GetAuditLogsAsync(int documentId)
+    public async Task<List<AuditLogs>> GetAuditLogsAsync()
     {
-        _logger.LogInformation($"Fetching audit logs for DocumentId: {documentId}");
-
-        var auditLog = await _context.AuditLogs
-            .Where(al => al.AuditDocumentId == documentId)
-            .OrderByDescending(al => al.AuditTimestamp)
-            .FirstOrDefaultAsync();
-
-        if (auditLog == null)
+        try
         {
-            _logger.LogWarning($"No audit log found for DocumentId: {documentId}");
-        }
-        else
-        {
-            _logger.LogInformation($"Audit log details retrieved: {auditLog}");
+            return await _context.AuditLogs.ToListAsync();
+
+
         }
 
-        return auditLog;
+        catch
+        {
+            throw;
+        }
+           
+
+     
+
+    
     }
 }

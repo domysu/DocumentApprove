@@ -2,7 +2,7 @@
 
 namespace DokumentuTvirtinimoSistema.Models
 {
-    public class AuditLog
+    public class AuditLogs
     {
             [Key] public int AuditId { get; set; }
             public int AuditDocumentId { get; set; }

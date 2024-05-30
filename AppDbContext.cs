@@ -34,7 +34,7 @@ namespace DokumentuTvirtinimoSistema
         public DbSet<WorkflowStatus> WorkflowStatus { get; set; }
         public DbSet<DocumentRequest> DocumentRequests { get; set; }
         public DbSet<DocumentData> DocumentData { get; set; }
-        public DbSet<AuditLog> AuditLogs { get; set; }
+        public DbSet<AuditLogs> AuditLogs { get; set; }
         public DbSet<DocumentTemplate> DocumentTemplates { get; set; }
 
 

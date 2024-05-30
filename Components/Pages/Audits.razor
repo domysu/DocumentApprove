@@ -1,39 +1,43 @@
 ﻿@page "/auditlog"
-@using DokumentuTvirtinimoSistema.Models
+@using DokumentuTvirtinimoSistema.Interfaces
 @using DokumentuTvirtinimoSistema.Services
+@using DokumentuTvirtinimoSistema.Models
 
 @inject AuditService AuditService
 
-@code {
-    [Parameter]
-    public int AuditDocumentId { get; set; }
-
-    private AuditLog auditlog;
-
-    protected override async Task OnInitializedAsync()
-    {
-        auditlog = await AuditService.GetAuditLogsAsync(AuditDocumentId);
-
-        if (auditlog == null)
-        {
-            Console.WriteLine($"No audits found: {AuditDocumentId}");
-        }
-        else
-        {
-            Console.WriteLine($"Audits found: DocumentId = {auditlog.AuditDocumentId}, Status = {auditlog.AuditStatus}, StatusEditTime = {auditlog.AuditTimestamp}");
-        }
-    }
-}
-
 <div>
-    @if (auditlog != null)
+    @if (AuditLog != null)
     {
+
+        @foreach(var auditlog in AuditLog)
+        {
         <p><strong>Document ID:</strong> @auditlog.AuditDocumentId</p>
         <p><strong>Status:</strong> @auditlog.AuditStatus</p>
         <p><strong>Status Edit Time:</strong> @auditlog.AuditTimestamp</p>
+        }
     }
     else
     {
-        <p>Loading...</p>
+        <span class="text-danger">@errorMessage</span>
     }
 </div>
+
+@code {
+
+    string errorMessage = "Unexpected error has occurred";
+    private List<AuditLogs> AuditLog = new List<AuditLogs>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        AuditLog = await AuditService.GetAuditLogsAsync();
+
+        if (AuditLog == null)
+        {
+            errorMessage = "Cannot fetch logs!";
+        }
+        else
+        {
+            errorMessage = "Error!";
+        }
+    }
+}
