@@ -36,10 +36,23 @@ public class AuditService : IAudit
         {
             throw;
         }
-           
+      
+    }
+    public async Task <AuditLogs> AddAuditLog(AuditLogs auditlogs)
+    {
 
-     
+        try
+        {
+             _context.AuditLogs.Add(auditlogs);
+            await _context.SaveChangesAsync();
+            return auditlogs;
 
-    
+        }
+        catch
+        {
+            throw;
+        }
+
+
     }
 }

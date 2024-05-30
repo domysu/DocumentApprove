@@ -29,6 +29,7 @@ builder.Services.AddScoped<RolesService>();
 builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<DocumentTemplate>();
 builder.Services.AddScoped<TemplateService>();
+builder.Services.AddScoped<IAudit,AuditService>();
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 

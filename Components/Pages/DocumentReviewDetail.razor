@@ -1,6 +1,9 @@
 ﻿@page "/document-review/{documentId:int}"
 @using DokumentuTvirtinimoSistema.Models
+@using DokumentuTvirtinimoSistema.Services
+@using DokumentuTvirtinimoSistema.Interfaces
 @using Microsoft.EntityFrameworkCore
+@inject IAudit AuditService
 @inject AppDbContext _context
 @inject NavigationManager Navigation
 @using Microsoft.AspNetCore.Authorization
@@ -42,6 +45,7 @@ else
     [Parameter] public int documentId { get; set; }
 
     private DocumentReview documentReview;
+    private AuditLogs AuditLog;
 
     protected override async Task OnInitializedAsync()
     {
@@ -57,11 +61,25 @@ else
                 };
             _context.DocumentReviews.Add(documentReview);
             await _context.SaveChangesAsync();
+
         }
+
+       
+
     }
 
     private async Task HandleValidSubmit()
     {
+        AuditLog = new AuditLogs
+            {
+                AuditDocumentId = documentId,
+                AuditStatus = documentReview.Status,
+                AuditTimestamp = DateTime.Now,
+
+
+            };
+        await AuditService.AddAuditLog(AuditLog);
+
         await _context.SaveChangesAsync();
         Navigation.NavigateTo("/document-reviews");
     }
