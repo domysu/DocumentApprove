@@ -5,22 +5,38 @@
 
 @inject AuditService AuditService
 
-<div>
-    @if (AuditLog != null)
-    {
 
-        @foreach(var auditlog in AuditLog)
-        {
-        <p><strong>Document ID:</strong> @auditlog.AuditDocumentId</p>
-        <p><strong>Status:</strong> @auditlog.AuditStatus</p>
-        <p><strong>Status Edit Time:</strong> @auditlog.AuditTimestamp</p>
-        }
-    }
-    else
-    {
-        <span class="text-danger">@errorMessage</span>
-    }
-</div>
+
+   
+@if(AuditLog != null)
+{
+<table class="table">
+    <thead>
+    <tr>
+        <th>DocumentID</th>
+        <th>Status</th>
+        <th>EditedAt</th>
+    </tr>
+        </thead>
+        <tbody>
+
+        
+            @foreach (var auditlog in AuditLog)
+            {
+                <tr>
+                <td>@auditlog.AuditDocumentId</td>
+                <td>@auditlog.AuditStatus</td>
+                <td>@auditlog.AuditTimestamp</td>
+                </tr>
+            }
+        
+    </tbody>
+</table>
+ }
+else
+{
+    <span class="text-danger">@errorMessage</span>
+}
 
 @code {
 
