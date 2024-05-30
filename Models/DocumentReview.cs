@@ -1,5 +1,12 @@
 ﻿namespace DokumentuTvirtinimoSistema.Models
 {
+
+
+    enum Status
+    { 
+        Approved,
+        Denied,
+    };
     public class DocumentReview
     {
         public int Id { get; set; }

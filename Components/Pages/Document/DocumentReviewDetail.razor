@@ -2,7 +2,7 @@
 @using DokumentuTvirtinimoSistema.Models
 @using DokumentuTvirtinimoSistema.Services
 @using DokumentuTvirtinimoSistema.Interfaces
-@using Microsoft.AspNetCore.Components.Authorization;
+@using Microsoft.AspNetCore.Components.Authorization
 @using Microsoft.AspNetCore.Authentication
 @using Microsoft.EntityFrameworkCore
 @using System.Security.Claims
@@ -14,6 +14,7 @@
 @using Microsoft.AspNetCore.Authorization
 @attribute [Authorize(Roles = "Admin")]
 @rendermode InteractiveServer
+
 <h3>Review Document @documentId</h3>
 
 @if (documentReview == null)
@@ -25,24 +26,30 @@ else
     <EditForm Model="documentReview" OnValidSubmit="HandleValidSubmit" FormName="DocumentReviewSubmit">
         <DataAnnotationsValidator />
         <ValidationSummary />
-        <div>
-            <label for="status">Status:</label>
-            <InputText id="status" @bind-Value="documentReview.Status" />
-        </div>
-        <div>
-            <label for="comments">Comments:</label>
-            <InputText id="comments" @bind-Value="documentReview.Comments" />
-        </div>
-        <div class="mt-5">
-            <label for="reviewedBy">Last Reviewed By:</label>
-            <InputText id="reviewedBy" @bind-Value="documentReview.ReviewedBy" readonly/>
-        </div>
-        <div>
-            <label for="reviewedDate">Reviewed Date:</label>
-            <InputDate id="reviewedDate" @bind-Value="documentReview.ReviewedDate" readonly />
-        </div>
 
-        <button type="submit">Submit Review</button>
+        <div class="form-group">
+            <label for="status">Status:</label>
+            <InputSelect id="status" class="form-select" @bind-Value="documentReview.Status">
+                <option value="">Select a status</option>
+                @foreach (var status in Enum.GetValues(typeof(Status)))
+                {
+                    <option value="@status">@status</option>
+                }
+            </InputSelect>
+        </div>
+        <div class="form-group">
+            <label for="comments">Comments:</label>
+            <InputText id="comments" class="form-control" @bind-Value="documentReview.Comments" />
+        </div>
+        <div class="form-group mt-5">
+            <label for="reviewedBy">Last Reviewed By:</label>
+            <InputText id="reviewedBy" class="form-control-plaintext" @bind-Value="documentReview.ReviewedBy" readonly />
+        </div>
+        <div class="form-group">
+            <label for="reviewedDate">Reviewed Date:</label>
+            <InputDate id="reviewedDate" class="form-control-plaintext" @bind-Value="documentReview.ReviewedDate" readonly />
+        </div>
+        <button type="submit" class="btn btn-primary mt-1">Submit Review</button>
     </EditForm>
 }
 
@@ -50,23 +57,28 @@ else
     [Parameter] public int documentId { get; set; }
 
     private DocumentReview documentReview;
-    private AuditLogs AuditLog;
+    private AuditLogs auditLog;
 
     protected override async Task OnInitializedAsync()
     {
         documentReview = await _context.DocumentReviews
             .FirstOrDefaultAsync(dr => dr.DocumentId == documentId);
 
-
-
-
-
+        if (documentReview == null)
+        {
+            documentReview = new DocumentReview
+            {
+                DocumentId = documentId,
+                SubmittedDate = DateTime.Now,
+            };
+            _context.DocumentReviews.Add(documentReview);
+            await _context.SaveChangesAsync();
+        }
     }
+
     public async Task<string> GetCurrentUser()
     {
         var currentUser = await CustomAuth.GetCurrentUser();
-
-
         return currentUser.Identity.Name;
     }
 
@@ -74,16 +86,15 @@ else
     {
         documentReview.ReviewedBy = await GetCurrentUser();
         documentReview.ReviewedDate = DateTime.Now;
-        AuditLog = new AuditLogs
-            {
-                AuditDocumentId = documentId,
-                AuditStatus = documentReview.Status,
-                AuditTimestamp = DateTime.Now,
 
+        auditLog = new AuditLogs
+        {
+            AuditDocumentId = documentId,
+            AuditStatus = documentReview.Status,
+            AuditTimestamp = DateTime.Now,
+        };
 
-            };
-        await AuditService.AddAuditLog(AuditLog);
-       
+        await AuditService.AddAuditLog(auditLog);
         await _context.SaveChangesAsync();
         Navigation.NavigateTo("/document-reviews");
     }
