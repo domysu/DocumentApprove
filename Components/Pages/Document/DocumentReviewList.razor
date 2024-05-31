@@ -79,6 +79,13 @@ else
     protected override async Task OnInitializedAsync()
     {
         documentReviews = await _context.DocumentReviews.ToListAsync();
+        foreach (var review in documentReviews)
+        {
+            if (review.Status != "Approved" && review.Status != "Denied")
+            {
+                review.Status = "Pending";
+            }
+        }
         DocumentCount = getFields();
     }
 

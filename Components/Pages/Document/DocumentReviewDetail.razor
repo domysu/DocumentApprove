@@ -75,10 +75,7 @@ else
             await _context.SaveChangesAsync();
         }
 
-        if(documentReview.Status == null)
-        {
-            documentReview.Status = "Pending"; // not working??
-        }
+       
     }
 
     public async Task<string> GetCurrentUser()
