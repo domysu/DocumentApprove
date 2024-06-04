@@ -24,12 +24,12 @@ namespace DokumentuTvirtinimoSistema
             }
         }
 
-        public DbSet<Department> Departments { get; set; }
+     
         public DbSet<Roles> Roles { get; set; } 
         public DbSet<User> Users { get; set; }
         public DbSet<DocumentReview> DocumentReviews { get; set; }
         public DbSet<ValidationLog> ValidationLogs { get; set; }
-        //public DbSet<UserRoles> UserRoles { get; set; }
+   
         public DbSet<DocumentCorrection> DocumentCorrections { get; set; }
         public DbSet<WorkflowStatus> WorkflowStatus { get; set; }
         public DbSet<DocumentRequest> DocumentRequests { get; set; }

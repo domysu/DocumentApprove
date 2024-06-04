@@ -13,14 +13,13 @@ namespace DokumentuTvirtinimoSistema.Models
         public string Username { get; set; }
         public string PasswordHash { get; set; }
         public string Email { get; set; }   
-        public int DepartmentId { get; set; }
+      
         public int RoleID {  get; set; }
         public bool isActive { get; set; }
 
         public DateTime LastLogin { get; set; }
      
       
-        public Department Department { get; set; }  
-       
+  
     }
 }

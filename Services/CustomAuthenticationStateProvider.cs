@@ -3,8 +3,12 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using System.Collections.Generic;
 using System.Security.Claims;
+using System.Net.NetworkInformation;
+using Microsoft.AspNetCore.Components.Authorization;
+using Microsoft.AspNetCore.Authentication;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
+using DokumentuTvirtinimoSistema.Models;
 
 public class CustomAuthenticationStateProvider : AuthenticationStateProvider
 {
@@ -26,6 +30,12 @@ public class CustomAuthenticationStateProvider : AuthenticationStateProvider
     {
         var user = _httpContextAccessor.HttpContext.User;
         return user;
+    }
+    public Task<string> GetCurrentUsersId()
+    {
+        var user = _httpContextAccessor.HttpContext?.User;
+        var userId = user?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        return Task.FromResult(userId);
     }
     public async Task MarkUserAsAuthenticated(ClaimsPrincipal user)
     {
