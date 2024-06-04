@@ -1,6 +1,9 @@
 ﻿@using DokumentuTvirtinimoSistema.Services
+@using DokumentuTvirtinimoSistema.Interfaces
 @using DokumentuTvirtinimoSistema.Models
+@using Microsoft.EntityFrameworkCore
 @inject CustomAuthenticationStateProvider CustomAuth
+@inject IUser UserService
 @inherits LayoutComponentBase
 @using System.Security.Claims
 
@@ -20,7 +23,7 @@
                     <a style="text-decoration:none" class="btn btn-primary" href="/register"><i class="fa-solid fa-user mx-2"></i>Register</a>
                 </NotAuthorized>
                 <Authorized>
-                    <a href="/account/"></a>
+                    <a href="/account/@userId">Profile</a>
                     <a href="/logout">Log out</a>
                 </Authorized>
                
@@ -42,11 +45,23 @@
     <a class="dismiss">🗙</a>
 </div>
 @code {
-    User users;
 
+    private int userId;
     protected override async Task OnInitializedAsync()
     {
-        var userId = await CustomAuth.GetCurrentUsersId();
-       
+
+        var userObj = await CustomAuth.GetCurrentUser();
+        userId = await GetUser(userObj);
+    }
+    private async Task<int> GetUser(ClaimsPrincipal user)
+    {
+
+        var username = user.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.Name)?.Value;
+        var users = await UserService.GetUsersAsync();
+        var userId = users.FirstOrDefault(u => u.Username == username)?.UserId ?? -1;
+
+      
+        return userId;
+
     }
 }

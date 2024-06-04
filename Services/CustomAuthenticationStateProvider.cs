@@ -31,12 +31,7 @@ public class CustomAuthenticationStateProvider : AuthenticationStateProvider
         var user = _httpContextAccessor.HttpContext.User;
         return user;
     }
-    public Task<string> GetCurrentUsersId()
-    {
-        var user = _httpContextAccessor.HttpContext?.User;
-        var userId = user?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-        return Task.FromResult(userId);
-    }
+   
     public async Task MarkUserAsAuthenticated(ClaimsPrincipal user)
     {
         _currentUser = user;

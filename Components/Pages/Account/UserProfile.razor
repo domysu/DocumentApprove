@@ -5,11 +5,11 @@
 @using Microsoft.AspNetCore.Authentication
 @using System.Security.Claims
 @inject CustomAuthenticationStateProvider CustomAuth
-<EditForm Model="@users" OnInvalidSubmit="HandleValidSubmit">
+<EditForm Model="@users" OnValidSubmit="HandleValidSubmit">
     <DataAnnotationsValidator/>
     <ValidationSummary/>
     <div class="form-group">
-        <input id="username" class="form-control-plaintext" @bind-value="users.Username"/>
+        <input id="username" class="form-control-plaintext" @bind-value="currentUser"/>
 
     </div>
 
@@ -18,10 +18,13 @@
 </EditForm>
 
 @code {
-    User users;
+    [Parameter]
+    public int userId { get; set; }
+    string currentUser;
+    User users = new User();
     protected override async Task OnInitializedAsync()
     {
-
+        currentUser = await GetCurrentUser();
 
 
     }
