@@ -67,7 +67,7 @@ else
     {
         try
         {
-            UserService.deleteUser(userId);
+            UserService.DeleteUserAsync(userId);
             
             NavigationManager.NavigateTo("/user-list");
             StateHasChanged();

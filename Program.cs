@@ -46,7 +46,8 @@ builder.Services.AddAuthorization();
 builder.Services.AddCascadingAuthenticationState();
 
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")),
+    ServiceLifetime.Scoped);
 
 var app = builder.Build();
 
