@@ -1,0 +1,41 @@
+﻿@page "/account/{userId:int}"
+@using DokumentuTvirtinimoSistema.Models
+@using DokumentuTvirtinimoSistema.Services
+@using Microsoft.AspNetCore.Components.Authorization;
+@using Microsoft.AspNetCore.Authentication
+@using System.Security.Claims
+@inject CustomAuthenticationStateProvider CustomAuth
+<EditForm Model="@users" OnInvalidSubmit="HandleValidSubmit">
+    <DataAnnotationsValidator/>
+    <ValidationSummary/>
+    <div class="form-group">
+        <input id="username" class="form-control-plaintext" @bind-value="users.Username"/>
+
+    </div>
+
+
+
+</EditForm>
+
+@code {
+    User users;
+    protected override async Task OnInitializedAsync()
+    {
+
+
+
+    }
+    public async Task<string> GetCurrentUser()
+    {
+        var currentUserObj = await CustomAuth.GetCurrentUser();
+        var currentUser = currentUserObj.Identity.Name;
+        return currentUser;
+    }
+
+    public async Task HandleValidSubmit()
+    {
+
+
+        return;
+    }
+}

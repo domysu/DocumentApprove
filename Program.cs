@@ -15,7 +15,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
-builder.Services.AddScoped<IDepartment, DepartmentService>();
+
 builder.Services.AddScoped<IRoles, RolesService>();
 builder.Services.AddScoped<IUser, UserService>();
 builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();

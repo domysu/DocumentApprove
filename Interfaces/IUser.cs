@@ -7,5 +7,6 @@ namespace DokumentuTvirtinimoSistema.Interfaces
         Task<User> AddUserAsync(User user, string password);
         Task<User> GetUserByUsernameAsync(string username);
         Task deleteUser(int id);
+        
     }
 }

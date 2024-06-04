@@ -60,21 +60,20 @@ else
     protected override async Task OnInitializedAsync()
     {
         templates = await TemplateService.GetAllTemplatesAsync();
-        string initiatingDepartment = await GetUserDepartmentAsync();
         string status = "Submitted for review";
         DateTime createdDate = DateTime.Now;
 
-        documentRequest = new DocumentRequest(initiatingDepartment, status, createdDate);
+        documentRequest = new DocumentRequest(status, createdDate);
     }
-
-    private async Task<string> GetUserDepartmentAsync()
+    /*
+   private async Task<string> GetUserDepartmentAsync()
     {
         var getUser = await CustomAuth.GetCurrentUser();
         var currentUser = getUser.Identity.Name;
         var user = await _context.Users.Include(u => u.Department).FirstOrDefaultAsync(u => u.Username == currentUser);
         return user?.Department?.DepartmentName;
     }
-
+    */
     private void AddDataField()
     {
         documentDataList.Add(new DocumentData());

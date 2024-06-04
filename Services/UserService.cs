@@ -2,13 +2,18 @@
 using DokumentuTvirtinimoSistema.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
+using System.Security.Claims;
+using DokumentuTvirtinimoSistema.Services;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.Identity.Client;
+using System.Data;
+using Microsoft.EntityFrameworkCore.Storage;
 
 namespace DokumentuTvirtinimoSistema.Services
 {
-    public class UserService : IUser
+    public class UserService : Interfaces.IUser
     {
         private readonly IPasswordHasher<User> _passwordHasher;
         private readonly AppDbContext _dbContext;
@@ -109,6 +114,6 @@ namespace DokumentuTvirtinimoSistema.Services
             return await _dbContext.Users
                                          .FirstOrDefaultAsync(u => u.Username == username);
         }
-    
+     
     }
 }

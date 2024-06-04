@@ -1,5 +1,8 @@
-﻿
+﻿@using DokumentuTvirtinimoSistema.Services
+@using DokumentuTvirtinimoSistema.Models
+@inject CustomAuthenticationStateProvider CustomAuth
 @inherits LayoutComponentBase
+@using System.Security.Claims
 
 <div class="page">
     <div class="sidebar">
@@ -17,6 +20,7 @@
                     <a style="text-decoration:none" class="btn btn-primary" href="/register"><i class="fa-solid fa-user mx-2"></i>Register</a>
                 </NotAuthorized>
                 <Authorized>
+                    <a href="/account/"></a>
                     <a href="/logout">Log out</a>
                 </Authorized>
                
@@ -37,3 +41,12 @@
     <a href="" class="reload">Reload</a>
     <a class="dismiss">🗙</a>
 </div>
+@code {
+    User users;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var userId = await CustomAuth.GetCurrentUsersId();
+       
+    }
+}
