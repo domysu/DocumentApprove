@@ -1,16 +1,36 @@
-﻿@page "/account/{userId:int}"
+﻿
+
+@page "/account/{userId:int}"
 @using DokumentuTvirtinimoSistema.Models
 @using DokumentuTvirtinimoSistema.Services
-@using Microsoft.AspNetCore.Components.Authorization;
+@using Microsoft.AspNetCore.Components.Authorization
 @using DokumentuTvirtinimoSistema.Interfaces
 @using Microsoft.AspNetCore.Authentication
 @using System.Security.Claims
-@inject IUser UserService
+@inject UserService UserService
+@inject AppDbContext _dbContext
 @inject CustomAuthenticationStateProvider CustomAuth
+@rendermode InteractiveServer
 
+@if (!authenticated)
+{
+    <div class="text-danger">
+        <span>
+            You are not authorized to access this page!!!
+        </span>
+
+    </div>
+}
+
+@if (authenticated)
+{
 <EditForm Model="@users" OnValidSubmit="HandleValidSubmit">
     <DataAnnotationsValidator />
     <ValidationSummary />
+
+ 
+        
+    
     <div class="form-group">
         <input id="username" class="form-control-plaintext" @bind-value="users.Username" />
     </div>
@@ -19,38 +39,52 @@
     </div>
     <button type="submit" class="btn btn-primary">Submit</button>
 </EditForm>
+    }
 
 @code {
     [Parameter]
     public int userId { get; set; }
+    public bool authenticated = false;
     string? currentUser;
     string? currentEmail;
     User users = new User();
 
     protected override async Task OnInitializedAsync()
     {
-        await LoadData();
-    }
-    private async Task LoadData()
-    {
         var currentUserObj = await CustomAuth.GetCurrentUser();
 
         if (currentUserObj?.Identity != null)
         {
+
             currentUser = currentUserObj.Identity.Name;
+            if(await getUserId(currentUserObj) == userId)
+            {
+                authenticated = true;
+                currentEmail = users.Email;
+            }
         }
 
-        var getcurrentuser = await UserService.GetUserByIdAsync(userId);
-        if(getcurrentuser != null)
-        {
-            currentEmail = getcurrentuser.Email;
-        }
+
+
+
+    }
+    private async Task<int> getUserId(ClaimsPrincipal users)
+    {
+
+        var username = users.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.Name)?.Value;
+        var userentity = await UserService.GetUserByUsernameAsync(username);
+
+
+
+        return userentity?.UserId ?? -1;
+
+
+
         
-
-        StateHasChanged();
     }
     public async Task HandleValidSubmit()
     {
-       
+        
+         await _dbContext.SaveChangesAsync();
     }
 }

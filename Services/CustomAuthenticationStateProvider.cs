@@ -3,22 +3,24 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using System.Collections.Generic;
 using System.Security.Claims;
-using System.Net.NetworkInformation;
-using Microsoft.AspNetCore.Components.Authorization;
-using Microsoft.AspNetCore.Authentication;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using DokumentuTvirtinimoSistema.Models;
+using Microsoft.EntityFrameworkCore;
+using DokumentuTvirtinimoSistema;
 
 public class CustomAuthenticationStateProvider : AuthenticationStateProvider
 {
-    private readonly IHttpContextAccessor _httpContextAccessor;
+    
+    private readonly AppDbContext _dbContext;
     private readonly ILogger<CustomAuthenticationStateProvider> _logger;
     private ClaimsPrincipal _currentUser = new ClaimsPrincipal(new ClaimsIdentity());
+    private readonly IHttpContextAccessor _httpContextAccessor;
 
-    public CustomAuthenticationStateProvider(IHttpContextAccessor httpContextAccessor, ILogger<CustomAuthenticationStateProvider> logger)
+    public CustomAuthenticationStateProvider(IHttpContextAccessor httpContextAccessor, AppDbContext dbContext, ILogger<CustomAuthenticationStateProvider> logger)
     {
         _httpContextAccessor = httpContextAccessor;
+        _dbContext = dbContext;
         _logger = logger;
     }
 
@@ -26,12 +28,13 @@ public class CustomAuthenticationStateProvider : AuthenticationStateProvider
     {
         return Task.FromResult(new AuthenticationState(_currentUser));
     }
+
     public async Task<ClaimsPrincipal> GetCurrentUser()
     {
-        var user = _httpContextAccessor.HttpContext.User;
+        var user = _currentUser;
         return user;
     }
-   
+
     public async Task MarkUserAsAuthenticated(ClaimsPrincipal user)
     {
         _currentUser = user;
@@ -44,9 +47,10 @@ public class CustomAuthenticationStateProvider : AuthenticationStateProvider
         _currentUser = new ClaimsPrincipal(new ClaimsIdentity());
         NotifyAuthenticationStateChanged(Task.FromResult(new AuthenticationState(_currentUser)));
 
-        if (_httpContextAccessor.HttpContext != null)
+        var httpContext = _httpContextAccessor.HttpContext;
+        if (httpContext != null)
         {
-            await _httpContextAccessor.HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme); // clear cookies so user logs out
+            await httpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme); // clear cookies so user logs out
         }
 
         _logger.LogInformation("User logged out");

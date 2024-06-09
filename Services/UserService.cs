@@ -15,7 +15,7 @@ namespace DokumentuTvirtinimoSistema.Services
 
         public UserService(AppDbContext dbContext, IPasswordHasher<User> passwordHasher)
         {
-            _dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
+            _dbContext = dbContext;
             _passwordHasher = passwordHasher ?? throw new ArgumentNullException(nameof(passwordHasher));
         }
 

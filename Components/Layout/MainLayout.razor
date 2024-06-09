@@ -13,24 +13,23 @@
     </div>
 
     <main>
-   
         <div class="top-row px-4">
-          
-            
             <AuthorizeView>
                 <NotAuthorized>
-                    <a  style="text-decoration:none "class="btn btn-primary" href="/login" role="button"><i class="fa-solid fa-circle-user mx-2"></i>Log in</a>
-                    <a style="text-decoration:none" class="btn btn-primary" href="/register"><i class="fa-solid fa-user mx-2"></i>Register</a>
+                    <a style="text-decoration:none" class="btn btn-primary" href="/login" role="button">
+                        <i class="fa-solid fa-circle-user mx-2"></i>Log in
+                    </a>
+                    <a style="text-decoration:none" class="btn btn-primary" href="/register">
+                        <i class="fa-solid fa-user mx-2"></i>Register
+                    </a>
                 </NotAuthorized>
                 <Authorized>
-                    <a href="/account/@userId">Profile</a>
-                    <a href="/logout">Log out</a>
+                   
+                         <a href="/account/@userId">Profile</a>
+                        <a href="/logout">Log out</a>
+                    
                 </Authorized>
-               
-
-
             </AuthorizeView>
-            
         </div>
 
         <article class="content px-4">
@@ -44,24 +43,32 @@
     <a href="" class="reload">Reload</a>
     <a class="dismiss">🗙</a>
 </div>
+
 @code {
 
-    private int userId;
+    User user = new User();
+    private int userId = -1;
+
     protected override async Task OnInitializedAsync()
     {
-
         var userObj = await CustomAuth.GetCurrentUser();
-        userId = await GetUser(userObj);
+        if (userObj != null)
+        {
+            userId = await GetUser(userObj);
+        }
     }
+
     private async Task<int> GetUser(ClaimsPrincipal user)
     {
-
         var username = user.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.Name)?.Value;
-        var users = await UserService.GetUsersAsync();
-        var userId = users.FirstOrDefault(u => u.Username == username)?.UserId ?? -1;
+        Console.WriteLine("Getting username: " + username);
+        if (string.IsNullOrEmpty(username))
+        {
+            return -2;
+        }
 
-      
-        return userId;
-
+        var userEntity = await UserService.GetUserByUsernameAsync(username);
+        return userEntity?.UserId ?? -1;
     }
+    
 }
